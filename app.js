@@ -5,6 +5,8 @@ let thumbNailBox = document.getElementById(`thumbnail-box`)
 let displayImage = document.getElementById(`display`)
 //set announcer
 const announcer = document.getElementById(`announcer`)
+//make current image index variable
+let currentImageIndex=0
 //make images object array
 let images = [
     {
@@ -29,7 +31,7 @@ let images = [
 const makeThumbNails = (images) => 
 {
     //loop through array of images
-    images.forEach( (image) => 
+    images.forEach( (image , index) => 
     {
     //create image tag using javascript , save to variable
     let img = document.createElement(`img`)
@@ -38,58 +40,68 @@ const makeThumbNails = (images) =>
     img.alt = image.alt
     //create class for img tag
     img.className= `img`
+
     // event listener
-    img.addEventListener("click",() =>
+    img.addEventListener("click", () =>
     {
         console.log(`image.alt`)
         //call createDisplayImage
-        createDisplayImage(image)
+        createDisplayImage(image , index)
       
     })
-    
+
     //append to thumbNailBox
     thumbNailBox.appendChild(img)
     //announce alt text 
     announceAltText(images.alt)
-    //
-    // handleArrowKeyPress(img)
     })
 }       
 
 //get display image, seperate from thumbnail bar
-function createDisplayImage(images)
+function createDisplayImage(images , index)
 {
     //set src and alt dire
     displayImage.src = images.url
     displayImage.alt = images.alt
     displayImage.className = `display-img`
+    //update global var to be the indexof the image that was clicked on 
+    currentImageIndex= index
     announceAltText(displayImage.alt)
    
 }
+
+//selectNextImage function
+function selectNextImage(number)
+{
+    //declare currentImage variable
+        currentImageIndex += number
+        if (currentImageIndex >= images.length)
+        {
+            currentImageIndex = 0
+        }
+        if(currentImageIndex < 0)
+        {
+            currentImageIndex = images.length -1
+        }
+        createDisplayImage(images[currentImageIndex] , currentImageIndex)
+}
+
+document.getElementById(`keyRight`).addEventListener(`click` , () => selectNextImage(1))
+document.getElementById(`keyLeft`).addEventListener('click' , () => selectNextImage (-1))
+window.addEventListener(`keydown` , handleArrowKeyPress);
 //handle arrow key event
 function handleArrowKeyPress(event)
 {
-    if (event.key === 'ArrowRight')
-    {
-        selectNextImage(currentImage+1);
-    }
-    else if (event.key === 'ArrowLeft')
-    {
-        selectNextImage( currentImage-1)
-    }
-}
-//selectNextImage function
-function selectNextImage(images)
-{
-    //declare currentImage variable
-        let currentImage = createDisplayImage(images[0])
-        currentImage +=1
-        if (currentImage >= images.length)
-        {
-            currentImage=createDisplayImage(images[0])
-        }
     
-
+if (event.key === 'ArrowRight')
+{
+    selectNextImage(1);
+}
+else if (event.key === 'ArrowLeft')
+{
+    selectNextImage(-1)
+}
+console.log(event.key)
 }
 //announce alt text function
 function announceAltText(altText)
@@ -101,5 +113,6 @@ function announceAltText(altText)
 makeThumbNails(images)
 //set display image on loading the page 
 createDisplayImage(images[0])
+createDisplayImage(images[currentImageIndex],currentImageIndex)
 
-handleArrowKeyPress(images)
+
